@@ -605,13 +605,14 @@ impl DomDriverTrait for DomDriverBrowser {
         });
     }
 
-    fn on_hash_route_change(&self, route: Value<String>) {
+    fn on_hash_route_change(&self, on_change: Rc<dyn Fn(String)>) {
         let myself = self.clone();
 
         let on_popstate = Closure::<dyn Fn(Event)>::new({
             move |_: Event| {
                 let path = myself.get_hash_location();
-                route.set_value(path);
+                //route.set_value(path);
+                on_change(path);
             }
         });
 

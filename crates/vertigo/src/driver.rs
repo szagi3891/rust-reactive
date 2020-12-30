@@ -5,7 +5,7 @@ use std::{
     rc::Rc,
 };
 
-use crate::computed::Value;
+use crate::computed::{Dependencies, Value};
 use crate::utils::EqBox;
 use crate::virtualdom::models::real_dom_id::RealDomId;
 
@@ -98,7 +98,7 @@ pub trait DomDriverTrait {
     fn fetch(&self, method: FetchMethod, url: String, headers: Option<HashMap<String, String>>, body: Option<String>) -> Pin<Box<dyn Future<Output=Result<String, FetchError>> + 'static>>;
     fn get_hash_location(&self) -> String;
     fn push_hash_location(&self, path: &str);
-    fn on_hash_route_change(&self, route: Value<String>);
+    fn on_hash_route_change(&self, route: Rc<dyn Fn(String)>);
 }
 
 type Executor = Box<dyn Fn(Pin<Box<dyn Future<Output = ()> + 'static>>) -> ()>;
@@ -227,6 +227,19 @@ impl DomDriver {
     pub fn on_hash_route_change(&self, route: Value<String>) {
         show_log("on_route_change".to_string());
         log::info!("traszka1");
-        self.driver.on_hash_route_change(route)
+
+        let root = Dependencies::default();
+        let value: Value<u32> = root.new_value(0);
+        let val = value.to_computed();
+
+        val.subscribe(|val| {
+            log::info!("tick z routera {}", val);
+        });
+
+        self.driver.on_hash_route_change({
+            Rc::new(move |url: String| {
+                value.set_value(url.len() as u32);
+            })
+        });
     }
 }
