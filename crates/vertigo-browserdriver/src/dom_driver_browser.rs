@@ -5,7 +5,7 @@ use std::{
     pin::Pin,
     rc::Rc,
 };
-use crate::element_wrapper::ElementWrapper;
+use crate::{MyClass, dom_driver_interval::DomDriverInterval, element_wrapper::ElementWrapper};
 use wasm_bindgen::{JsCast, prelude::Closure, JsValue};
 use web_sys::{Document, Event, HtmlHeadElement, Node, HtmlInputElement, HtmlTextAreaElement, Window, Element};
 
@@ -35,6 +35,7 @@ struct DomDriverBrowserInner {
     elements: HashMap<RealDomId, ElementWrapper>,
     child_parent: HashMap<RealDomId, RealDomId>,            //child -> parent
     _dom_event_disconnect: Vec<DomEvent>,
+    dom_driver_interval: DomDriverInterval,
 }
 
 impl DomDriverBrowserInner {
@@ -46,6 +47,8 @@ impl DomDriverBrowserInner {
         let mut elements = HashMap::new();
         elements.insert(root_id, ElementWrapper::from_node(root.clone()));
 
+        let dom_driver_interval = DomDriverInterval::new();
+
         let dom_driver_inner = DomDriverBrowserInner {
             window,
             document,
@@ -54,6 +57,7 @@ impl DomDriverBrowserInner {
             elements,
             child_parent: HashMap::new(),
             _dom_event_disconnect: Vec::new(),
+            dom_driver_interval,
         };
 
         Rc::new(BoxRefCell::new(
@@ -279,6 +283,9 @@ impl DomDriverBrowser {
             state._dom_event_disconnect = dom_event_disconnect;
         });
 
+        let aa = MyClass::new();
+        log::info!("render {}", aa.render());
+        
         DomDriver::new(dom_driver_browser, Box::new(|fut: Pin<Box<dyn Future<Output = ()> + 'static>>| {
             wasm_bindgen_futures::spawn_local(fut);
         }))
@@ -480,10 +487,8 @@ impl DomDriverTrait for DomDriverBrowser {
     }
 
     fn set_interval(&self, time: u32, func: Box<dyn Fn()>) -> DropResource {
-        let drop_resource = crate::set_interval::Interval::new(time, func);
-
-        DropResource::new(move || {
-            drop_resource.off();
+        self.driver.get_with_context((time, func), |state, (time, func)| {
+            state.dom_driver_interval.set_interval(time, func)
         })
     }
 }

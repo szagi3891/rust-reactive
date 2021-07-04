@@ -2806,9 +2806,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-run"
-version = "0.8.1"
+version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f8b321dda4627b6a7899d837b76cf0fe823cb200f3a726bb63e476978dcdb8b4"
+checksum = "58dd928cec36337b8d419f1d686672e093d2b9dca6fac8efb36ccf1fa7fad2b6"
 dependencies = [
  "anyhow",
  "async-std",
