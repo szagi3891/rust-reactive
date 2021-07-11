@@ -7,6 +7,7 @@ members = [
     "crates/vertigo-html",
     "crates/vertigo-html-macro",
     "crates/vertigo-testing",
+    "crates/vertigo-typescript-makro",
 ]
 
 

@@ -389,6 +389,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "vertigo-typescript-macro"
+version = "0.1.0-alpha.3"
+dependencies = [
+ "log",
+ "proc-macro-error",
+ "proc-macro2",
+]
+
+[[package]]
 name = "wasm-bindgen"
 version = "0.2.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"

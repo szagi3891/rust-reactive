@@ -1,4 +1,5 @@
 #![allow(clippy::new_ret_no_self)]
+#![allow(clippy::module_inception)]
 
 use wasm_bindgen::prelude::*;
 
